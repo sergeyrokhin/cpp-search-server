@@ -227,13 +227,13 @@ private:
                 //         document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 //     }
                 // }
-                // переменная bool введена для читаемости кода.
-                // понимаю, что при компиляции закомментированного кода, будут созданы разные функции FindAllDocuments
-                // и в каждую из функций попадет только свой блок кода.
-                // при многофайловом проекте если шаблон будет вынесен в другой файл, то требуется задать компилятору 
-                // указание на компиляцию соответствующих реализаций шаблона
-                // Например:
-                // template Test<float>; //для конструктора
+                // РїРµСЂРµРјРµРЅРЅР°СЏ bool РІРІРµРґРµРЅР° РґР»СЏ С‡РёС‚Р°РµРјРѕСЃС‚Рё РєРѕРґР°.
+                // РїРѕРЅРёРјР°СЋ, С‡С‚Рѕ РїСЂРё РєРѕРјРїРёР»СЏС†РёРё Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРґР°, Р±СѓРґСѓС‚ СЃРѕР·РґР°РЅС‹ СЂР°Р·РЅС‹Рµ С„СѓРЅРєС†РёРё FindAllDocuments
+                // Рё РІ РєР°Р¶РґСѓСЋ РёР· С„СѓРЅРєС†РёР№ РїРѕРїР°РґРµС‚ С‚РѕР»СЊРєРѕ СЃРІРѕР№ Р±Р»РѕРє РєРѕРґР°.
+                // РїСЂРё РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРј РїСЂРѕРµРєС‚Рµ РµСЃР»Рё С€Р°Р±Р»РѕРЅ Р±СѓРґРµС‚ РІС‹РЅРµСЃРµРЅ РІ РґСЂСѓРіРѕР№ С„Р°Р№Р», С‚Рѕ С‚СЂРµР±СѓРµС‚СЃСЏ Р·Р°РґР°С‚СЊ РєРѕРјРїРёР»СЏС‚РѕСЂСѓ 
+                // СѓРєР°Р·Р°РЅРёРµ РЅР° РєРѕРјРїРёР»СЏС†РёСЋ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… СЂРµР°Р»РёР·Р°С†РёР№ С€Р°Р±Р»РѕРЅР°
+                // РќР°РїСЂРёРјРµСЂ:
+                // template Test<float>; //РґР»СЏ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°
                 // template void PrintTest(Test<float> t);
 
                 bool is_selected = false;
@@ -278,7 +278,7 @@ private:
 };
 
 
-// ==================== для примера =========================
+// ==================== РґР»СЏ РїСЂРёРјРµСЂР° =========================
 
 void PrintDocument(const Document& document) {
     cout << "{ "s
@@ -290,21 +290,21 @@ void PrintDocument(const Document& document) {
 
 int main() {
     SearchServer search_server;
-    search_server.SetStopWords("и в на"s);
-    search_server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
-    search_server.AddDocument(1, "пушистый кот пушистый хвост"s,       DocumentStatus::ACTUAL, {7, 2, 7});
-    search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
-    search_server.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::BANNED, {9});
+    search_server.SetStopWords("Рё РІ РЅР°"s);
+    search_server.AddDocument(0, "Р±РµР»С‹Р№ РєРѕС‚ Рё РјРѕРґРЅС‹Р№ РѕС€РµР№РЅРёРє"s,        DocumentStatus::ACTUAL, {8, -3});
+    search_server.AddDocument(1, "РїСѓС€РёСЃС‚С‹Р№ РєРѕС‚ РїСѓС€РёСЃС‚С‹Р№ С…РІРѕСЃС‚"s,       DocumentStatus::ACTUAL, {7, 2, 7});
+    search_server.AddDocument(2, "СѓС…РѕР¶РµРЅРЅС‹Р№ РїС‘СЃ РІС‹СЂР°Р·РёС‚РµР»СЊРЅС‹Рµ РіР»Р°Р·Р°"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
+    search_server.AddDocument(3, "СѓС…РѕР¶РµРЅРЅС‹Р№ СЃРєРІРѕСЂРµС† РµРІРіРµРЅРёР№"s,         DocumentStatus::BANNED, {9});
     cout << "ACTUAL by default:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
+    for (const Document& document : search_server.FindTopDocuments("РїСѓС€РёСЃС‚С‹Р№ СѓС…РѕР¶РµРЅРЅС‹Р№ РєРѕС‚"s)) {
         PrintDocument(document);
     }
     cout << "BANNED:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, DocumentStatus::BANNED)) {
+    for (const Document& document : search_server.FindTopDocuments("РїСѓС€РёСЃС‚С‹Р№ СѓС…РѕР¶РµРЅРЅС‹Р№ РєРѕС‚"s, DocumentStatus::BANNED)) {
         PrintDocument(document);
     }
     cout << "Even ids:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
+    for (const Document& document : search_server.FindTopDocuments("РїСѓС€РёСЃС‚С‹Р№ СѓС…РѕР¶РµРЅРЅС‹Р№ РєРѕС‚"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
         PrintDocument(document);
     }
     return 0;
