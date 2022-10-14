@@ -227,6 +227,15 @@ private:
                 //         document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 //     }
                 // }
+                // переменна€ bool введена дл€ читаемости кода.
+                // понимаю, что при компил€ции закомментированного кода, будут созданы разные функции FindAllDocuments
+                // и в каждую из функций попадет только свой блок кода.
+                // при многофайловом проекте если шаблон будет вынесен в другой файл, то требуетс€ задать компил€тору 
+                // указание на компил€цию соответствующих реализаций шаблона
+                // Ќапример:
+                // template Test<float>; //дл€ конструктора
+                // template void PrintTest(Test<float> t);
+
                 bool is_selected = false;
                 if constexpr (is_same_v<DocumentPredicate, DocumentStatus>)
                 {
