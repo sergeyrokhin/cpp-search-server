@@ -6,13 +6,13 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#include <numeric>
 
 using namespace std;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 inline static constexpr int INVALID_DOCUMENT_ID = -1;
-
+inline static constexpr double INNACURACY = 1e-6;
 string ReadLine()
 {
     string s;
@@ -133,14 +133,7 @@ public:
     int GetDocumentId(int index) const
     {
         if (!(index >= 0 && static_cast<size_t>(index) < documents_.size())) throw out_of_range("за пределами индекса");
-        for (auto it = begin(documents_); it != end(documents_); it++)
-        {
-            if (0 == index--)
-            {
-                return (*it).first;
-            }
-        }
-        return INVALID_DOCUMENT_ID; // такого быть не может
+        return order_[index];
     }
     void AddDocument(int document_id, const string &document, DocumentStatus status,
                                    const vector<int> &ratings)
@@ -159,21 +152,20 @@ public:
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
+        order_.push_back(document_id);
     }
 
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
 
         const Query query = ParseQuery(raw_query);
-        if (!WordsAreCorrect(query.minus_words))            throw invalid_argument("недопустимые минус-слова в строке поиска");
-        if (!WordsAreCorrect(query.plus_words))            throw invalid_argument("недопустимые слова в строке поиска");
 
         auto result = FindAllDocuments(query, document_predicate);
 
         sort(result.begin(), result.end(),
              [](const Document &lhs, const Document &rhs)
              {
-                 if (abs(lhs.relevance - rhs.relevance) < 1e-6)
+                 if (abs(lhs.relevance - rhs.relevance) < INNACURACY)
                  {
                      return lhs.rating > rhs.rating;
                  }
@@ -208,9 +200,7 @@ public:
     MatchDocument(const string &raw_query, int document_id) const
     {
         const Query query = ParseQuery(raw_query);
-        if (!WordsAreCorrect(query.minus_words))            throw invalid_argument("недопустимые минус-слова в строке поиска");
-        if (!WordsAreCorrect(query.plus_words))            throw invalid_argument("недопустимые слова в строке поиска");
-        
+               
 
         vector<string> matched_words;
         for (const string &word : query.plus_words)
@@ -236,10 +226,7 @@ public:
                 break;
             }
         }
-        tuple<vector<string>, DocumentStatus> result;
-        get<0>(result) = matched_words;
-        get<1>(result) = documents_.at(document_id).status;
-        return result;
+        return {matched_words, documents_.at(document_id).status};
     }
 
 private:
@@ -251,6 +238,7 @@ private:
     const set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, DocumentData> documents_;
+    vector<int> order_;
 
     bool IsStopWord(const string &word) const
     {
@@ -276,12 +264,7 @@ private:
         {
             return 0;
         }
-        int rating_sum = 0;
-        for (const int rating : ratings)
-        {
-            rating_sum += rating;
-        }
-        return rating_sum / static_cast<int>(ratings.size());
+        return accumulate(ratings.begin(), ratings.end(), 0) / static_cast<int>(ratings.size());
     }
 
     struct QueryWord
@@ -300,6 +283,7 @@ private:
             is_minus = true;
             text = text.substr(1);
         }
+        if( ! MyIsValidWord(text)) throw invalid_argument("недопустимые слова");
         return {text, is_minus, IsStopWord(text)};
     }
 
