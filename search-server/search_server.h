@@ -1,5 +1,4 @@
 #pragma once
-#include <cmath>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -9,10 +8,12 @@
 #include <algorithm>
 #include "document.h"
 #include "string_processing.h"
+#include <cmath>
 
 using namespace std;
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
+const double  INACCURACY = 1e-6;
 class SearchServer {
 public:
     template <typename StringContainer>
@@ -37,7 +38,7 @@ public:
 
         sort(matched_documents.begin(), matched_documents.end(),
             [](const Document& lhs, const Document& rhs) {
-                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                if (abs(lhs.relevance - rhs.relevance) < INACCURACY) {
                     return lhs.rating > rhs.rating;
                 }
                 else {

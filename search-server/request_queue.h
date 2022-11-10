@@ -10,7 +10,7 @@ public:
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate) {
         std::vector<Document> result =
             search_server_.FindTopDocuments(raw_query, document_predicate);
-        save_result(result.size() == 0);
+        SaveResult(result.size() == 0);
         return result;
     }
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus status);
@@ -19,7 +19,7 @@ public:
         return count_empty;
     }
 private:
-    void save_result(bool is_empty);
+    void SaveResult(bool is_empty);
     struct QueryResult {
         QueryResult(bool empty) : empty_request_queue(empty) {}
         bool empty_request_queue;

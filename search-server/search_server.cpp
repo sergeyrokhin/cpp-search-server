@@ -1,4 +1,4 @@
-
+#include <numeric>
 #include "search_server.h"
 
 SearchServer::SearchServer(const std::string& stop_words_text)
@@ -81,11 +81,7 @@ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
     if (ratings.empty()) {
         return 0;
     }
-    int rating_sum = 0;
-    for (const int rating : ratings) {
-        rating_sum += rating;
-    }
-    return rating_sum / static_cast<int>(ratings.size());
+    return std::accumulate(ratings.begin(), ratings.end(), 0) / static_cast<int>(ratings.size());
 }
 
 SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
