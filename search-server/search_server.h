@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "document.h"
 #include "string_processing.h"
+#include "log_duration.h"
 #include <cmath>
 
 using namespace std;
@@ -32,6 +33,8 @@ public:
     template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::string& raw_query,
         DocumentPredicate document_predicate) const {
+
+
         const auto query = ParseQuery(raw_query);
 
         auto matched_documents = FindAllDocuments(query, document_predicate);
@@ -56,9 +59,13 @@ public:
     std::vector<Document> FindTopDocuments(const std::string& raw_query) const;
 
     size_t GetDocumentCount() const;
-    int GetDocumentId(int index) const;
+    //int GetDocumentId(int index) const;
 
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
+    set<int>::iterator begin();
+    set<int>::iterator end();
+    set<int>::const_iterator cbegin() const;
+    set<int>::const_iterator cend() const;
 
 private:
     struct DocumentData {
@@ -68,7 +75,10 @@ private:
     const std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
-    std::vector<int> document_ids_;
+    std::map<int, vector<string>> documents_words;
+    std::map<int, set<int>> index_documents;
+    std::map<int, int>  documents_index;
+    std::set<int> document_ids_;
 
     bool IsStopWord(const std::string& word) const;
 
@@ -131,4 +141,14 @@ private:
         }
         return matched_documents;
     }
+public:
+    const map<string, double> GetWordFrequencies(int document_id) const;
+    void RemoveDocument(int document_id);
+    void RemoveDuplicates();
+    void RemoveDuplicates(set<int>& dup);
+
+    void FindTopDocuments(const SearchServer& search_server, const string& raw_query);
+    void MatchDocuments(const SearchServer& search_server, const string& query);
 };
+
+void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings);

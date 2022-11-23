@@ -23,7 +23,6 @@ private:
     Iterator end_;
 };
 
-
 template <typename Iterator>
 class Paginator
 {
@@ -32,7 +31,7 @@ public:
     Paginator(const Iterator begin, const Iterator end, size_t page_size)
         : page_size_(page_size)
     {
-        assert(end >= begin && page_size == 0);
+        assert(page_size != 0);
         Iterator it2 = begin;
         while (it2 != end)
         {
