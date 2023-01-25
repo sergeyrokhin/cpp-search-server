@@ -4,9 +4,6 @@
 #include <vector>
 #include <iostream>
 
-
-using namespace std;
-
 template <typename Iterator>
 class IteratorRange {
 public:
@@ -28,11 +25,13 @@ class Paginator
 {
 public:
     Paginator() = delete;
-    Paginator(const Iterator begin, const Iterator end, size_t page_size)
-        : page_size_(page_size)
-    {
-        assert(page_size != 0);
+    Paginator(const Iterator begin, const Iterator end, size_t page_size) : page_size_(page_size) {
+        if (page_size = = 0) {
+            throw std::invalid_argument("received zero page size");
+        }
+
         Iterator it2 = begin;
+
         while (it2 != end)
         {
             Iterator it1 = it2;
@@ -47,26 +46,36 @@ public:
             pages_.emplace_back(IteratorRange<Iterator>(it1, it2, i));
         }
     }
-    int size() const { return pages_.size(); }
-    auto end() const { return pages_.end(); }
-    auto begin() const { return pages_.begin(); }
+
+    int size() const { 
+        return pages_.size();
+    }
+
+    auto end() const { 
+        return pages_.end(); 
+    }
+    
+    auto begin() const {
+        return pages_.begin(); 
+    }
+
 private:
     size_t page_size_;
     vector<IteratorRange<Iterator>> pages_;
 };
 
-
 template <typename T, typename Iterator>
 T& operator<<(T& out, const IteratorRange<Iterator>& page) {
-    for (auto doc = page.begin(); doc != page.end(); doc++)
-    {
-        out << "{ document_id = "s << (*doc).id << ", relevance = " << (*doc).relevance << ", rating = " << (*doc).rating << " }"s;
+    for (auto doc = page.begin(); doc != page.end(); doc++) {
+        out << "{ document_id = "s << (*doc).id 
+            << ", relevance = "    << (*doc).relevance 
+            << ", rating = "       << (*doc).rating 
+            << " }"s;
     }
     return out;
 }
 
 template <typename Container>
-auto Paginate(Container& c, size_t page_size)
-{
+auto Paginate(Container& c, size_t page_size) {
     return Paginator(begin(c), end(c), page_size);
 }

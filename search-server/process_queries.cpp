@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <execution>
 
+using namespace std;
 
 vector<vector<Document>> ProcessQueries(const SearchServer& search_server, const vector<string>& queries) {
 	vector<vector<Document>> documents_lists(queries.size());

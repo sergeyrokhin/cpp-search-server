@@ -1,12 +1,9 @@
 #pragma once
 #include <cstdlib>
 #include <map>
+#include <vector>
 #include <mutex>
 #include <string>
-#include <vector>
-
-#include "log_duration.h"
-#include "test_framework.h"
 
 using namespace std::string_literals;
 
@@ -14,20 +11,20 @@ template <typename Key, typename Value>
 class ConcurrentMap {
 private:
     struct Bucket {
-        mutex b_mut;
-        map<Key, Value> b_map;
+        std::mutex bucket_mutex;
+        std::map<Key, Value> bucket_map;
     };
 
 public:
-    static_assert(is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+    static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
 
     struct Access {
-        lock_guard<mutex> guard;
+        std::lock_guard<std::mutex> guard;
         Value& ref_to_value;
 
         Access(const Key& key, Bucket& bucket)
-            : guard(bucket.b_mut)
-            , ref_to_value(bucket.b_map[key]) {
+            : guard(bucket.bucket_mutex)
+            , ref_to_value(bucket.bucket_map[key]) {
         }
     };
 
@@ -42,15 +39,15 @@ public:
 
     void Erase(const Key& key) {
         auto& bucket = buckets_[static_cast<uint64_t>(key) % buckets_.size()];
-        auto lock = lock_guard(bucket.b_mut);
-        bucket.b_map.erase(key);
+        auto lock = std::lock_guard(bucket.bucket_mutex);
+        bucket.bucket_map.erase(key);
     }
 
-    map<Key, Value> BuildOrdinaryMap() {
-        map<Key, Value> result;
-        for (auto& [b_mut, b_map] : buckets_) {
-            lock_guard g(b_mut);
-            result.insert(b_map.begin(), b_map.end());
+    std::map<Key, Value> BuildOrdinaryMap() {
+        std::map<Key, Value> result;
+        for (auto& [bucket_mutex, bucket_map] : buckets_) {
+            std::lock_guard g(bucket_mutex);
+            result.insert(bucket_map.begin(), bucket_map.end());
         }
         return result;
     }
